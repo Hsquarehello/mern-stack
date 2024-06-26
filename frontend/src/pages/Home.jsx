@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import RecipeCard from "../components/RecipesCard";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Pagination from "../components/Pagination";
 import axios from "../helpers/axios";
@@ -57,13 +56,7 @@ const Home = () => {
         {!recipes.length && <Loading />}
         <div className=" grid grid-cols-1 lg:grid-cols-3 gap-2 sm:grid-cols-1 md:grid-cols-2">
           {!!recipes.length &&
-            recipes.map((recipe) => ( 
-              // <RecipeCard
-              //   recipe={recipe}
-              //   key={recipe._id}
-              //   recipes={recipes}
-              //   onDelete={onDelete}
-              // />
+            recipes.map((recipe) => (
               <Rcard
                 recipe={recipe}
                 key={recipe._id}

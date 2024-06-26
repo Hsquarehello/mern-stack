@@ -1,11 +1,10 @@
 const { default: mongoose } = require("mongoose");
 const Recipe = require("../models/Recipe");
-const removeFile = require('../helper/removeFile')
-const User = require('../models/User');
-const sendEmail = require("../helper/sendEmail");
+const removeFile = require("../helper/removeFile");
+const User = require("../models/User");
+const emailQueue =  require('../Queue/emailQueue')
 
 const RecipeController = {
-
   /**
    * Retrieves a paginated list of recipes from the database, along with pagination links.
    *
@@ -60,19 +59,21 @@ const RecipeController = {
       description,
       ingredients,
     });
-    let users = await User.find(null,['email'])
-    let emails = users.map(user => user.email)
-    emails = emails.filter(email => email !== req.user.email)
-    // await sendEmail({
-    //   viewFile: 'email',
-    //   data: {
-    //     name: req.user.name,
-    //     newRecipe: recipe.title
-    //   },
-    //   from: req.user.email,
-    //   to: emails,
-    //   subject: 'new recipe',
-    // })
+    console.log(req.user.name)
+    let users = await User.find(null, ["email"]);
+    let emails = users.map((user) => user.email);
+    emails = emails.filter((email) => email !== req.user.email);
+    // Add a job to the email queue
+    emailQueue.add({
+      viewFile: "email",
+      data: {
+        name: req.user.name,
+        newRecipe: recipe.title,
+      },
+      from: req.user.email,
+      to: emails,
+      subject: "new recipe",
+    });
     return res.json(recipe);
   },
   destory: async (req, res) => {
@@ -86,7 +87,7 @@ const RecipeController = {
         return res.status(404).json({ err: "recipe not found" });
       }
       // delete file
-      await removeFile(__dirname + '/../public' + recipe.photo)
+      await removeFile(__dirname + "/../public" + recipe.photo);
       return res.json(recipe);
     } catch (e) {
       return res.status(500).json({ err: "internet error" });
@@ -107,7 +108,7 @@ const RecipeController = {
       });
 
       // delete photo if it exists
-      await removeFile(__dirname + '/../public' + recipe.photo)
+      await removeFile(__dirname + "/../public" + recipe.photo);
 
       // throw err if recipe not found
       if (!recipe) {
@@ -120,7 +121,7 @@ const RecipeController = {
       return res.status(500).json({ err: "internet error" });
     }
   },
-  upload:async (req,res) => {
+  upload: async (req, res) => {
     try {
       let id = req.params.id;
 
@@ -129,7 +130,7 @@ const RecipeController = {
       }
 
       let recipe = await Recipe.findByIdAndUpdate(id, {
-        photo: '/' + req.file.filename,
+        photo: "/" + req.file.filename,
       });
 
       if (!recipe) {
@@ -140,7 +141,7 @@ const RecipeController = {
     } catch (e) {
       return res.status(500).json({ err: "internet error" });
     }
-  }
+  },
 };
 
 module.exports = RecipeController;

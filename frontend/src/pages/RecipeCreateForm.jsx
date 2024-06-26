@@ -10,7 +10,7 @@ export default function RecipeCreateForm() {
   let [description, setDescription] = useState("");
   let [newIngredients, setNewIngredients] = useState("");
   let [errors, setErrors] = useState([]);
-  let [loading,setLoading] = useState(false)
+  let [loading, setLoading] = useState(false);
   let [file, setFile] = useState(null);
   let [preview, setPreview] = useState(null);
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ export default function RecipeCreateForm() {
           setTitle(res.data.title);
           setDescription(res.data.description);
           setIngredients(res.data.ingredients);
-          setPreview(import.meta.env.VITE_BACKEND_URL + res.data.photo)
+          setPreview(import.meta.env.VITE_BACKEND_URL + res.data.photo);
         }
       }
     };
@@ -39,7 +39,7 @@ export default function RecipeCreateForm() {
 
   const submitRecipe = async (e) => {
     e.preventDefault();
-    setLoading(true)
+    setLoading(true);
     try {
       let recipe = {
         title,
@@ -54,22 +54,26 @@ export default function RecipeCreateForm() {
         res = await axios.post("/api/recipes", recipe);
       }
 
-      let formData = new FormData;
-      formData.set('photo', file)
+      let formData = new FormData();
+      formData.set("photo", file);
 
-      let uploadRes = await axios.post(`/api/recipes/${res.data._id}/upload`, formData,{
-        headers: {
-          Accept: "multipart/form-data",
+      let uploadRes = await axios.post(
+        `/api/recipes/${res.data._id}/upload`,
+        formData,
+        {
+          headers: {
+            Accept: "multipart/form-data",
+          },
         }
-      })
-      console.log(uploadRes)
+      );
+      console.log(uploadRes);
 
       if (res.status == 200) {
-        setLoading(false)
+        setLoading(false);
         navigate("/");
       }
     } catch (e) {
-      setLoading(false)
+      setLoading(false);
       setErrors(Object.keys(e.response.data.errors));
     }
   };
@@ -171,8 +175,17 @@ export default function RecipeCreateForm() {
         {/* Submit Button */}
         <button
           type="submit"
-          className={`bg-gray-800 py-3 px-4 text-white rounded w-full ${loading ? 'cursor-wait': 'cursor-pointer'}`}>
-          {id? "Update Recipe": "Create Recipe"}
+          className={`bg-gray-800 py-3 px-4 text-white rounded w-full ${
+            loading ? "cursor-wait" : "cursor-pointer"
+          } flex items-center justify-center`}>
+          {loading && (
+            <div class="w-full gap-x-2 flex justify-center items-center h-6">
+              <div class="w-2 bg-white animate-pulse h-2 rounded-full animate-bounce"></div>
+              <div class="w-2 animate-pulse h-2 bg-white rounded-full animate-bounce  "></div>
+              <div class="w-2 h-2 animate-pulse bg-white rounded-full animate-bounce"></div>
+            </div>
+          )}
+          {!loading && <span>{id ? "Update Recipe" : "Create Recipe"}</span>}
         </button>
       </form>
     </div>

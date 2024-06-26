@@ -3,7 +3,6 @@ const router = express.Router();
 const RecipeController = require("../controllers/RecipeController");
 const { body } = require("express-validator");
 const handleErrMsg = require("../middlewares/handleErrMsg");
-const AuthMiddleware = require("../middlewares/authMiddleware");
 const upload = require("../helper/upload");
 
 router.get("", RecipeController.index);
